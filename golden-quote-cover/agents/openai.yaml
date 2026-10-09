@@ -1,0 +1,7 @@
+interface:
+  display_name: "金句封面工坊"
+  short_description: "从字幕提炼金句并按参考样式完成封面叠图排版"
+  default_prompt: "Use $golden-quote-cover to extract quotes from my subtitles and compose them onto the supplied video cover."
+
+policy:
+  allow_implicit_invocation: true
