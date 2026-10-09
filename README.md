@@ -12,6 +12,8 @@
 
 Provide a cover image, subtitle transcript, and optional visual reference. The skill selects quote candidates, preserves the source wording, and renders the final text with a deterministic image compositor so Chinese characters remain exact.
 
+Covers for Douyin and Xiaohongshu default to **3:4 (width:height)**. The compositor crops the source to an exact 3:4 canvas before placing text, without stretching the image. It retains the largest crop at the source resolution. Inspect the crop and adjust `--crop-position X Y` (0–1) to preserve the subject; the default is `0.5 0.5`, and `0.5 0` keeps the top. Use `--aspect-ratio W:H` only when another ratio is requested, or `--aspect-ratio source` to keep the original ratio explicitly.
+
 For a manually selected quote set:
 
 ```bash

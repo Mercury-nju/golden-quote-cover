@@ -4,11 +4,12 @@
 from __future__ import annotations
 
 import argparse
+import math
 import os
 from pathlib import Path
 from typing import Iterable
 
-from PIL import Image, ImageChops, ImageDraw, ImageFont
+from PIL import Image, ImageChops, ImageDraw, ImageFont, ImageOps
 
 
 FONT_CANDIDATES = (
@@ -19,6 +20,48 @@ FONT_CANDIDATES = (
     "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
     "/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc",
 )
+
+
+def parse_aspect_ratio(value: str) -> tuple[int, int] | None:
+    if value == "source":
+        return None
+    try:
+        width, height = (int(part) for part in value.split(":"))
+        if width <= 0 or height <= 0:
+            raise ValueError
+    except ValueError as error:
+        raise argparse.ArgumentTypeError("Use a positive W:H ratio, such as 3:4, or source.") from error
+    divisor = math.gcd(width, height)
+    return width // divisor, height // divisor
+
+
+def parse_crop_position(value: str) -> float:
+    try:
+        position = float(value)
+        if not 0 <= position <= 1:
+            raise ValueError
+    except ValueError as error:
+        raise argparse.ArgumentTypeError("Crop positions must be between 0 and 1.") from error
+    return position
+
+
+def prepare_cover(
+    image: Image.Image,
+    aspect_ratio: tuple[int, int] | None = (3, 4),
+    crop_position: tuple[float, float] = (0.5, 0.5),
+) -> Image.Image:
+    image = ImageOps.exif_transpose(image).convert("RGBA")
+    if aspect_ratio is None:
+        return image
+    width, height = image.size
+    ratio_width, ratio_height = aspect_ratio
+    scale = min(width // ratio_width, height // ratio_height)
+    if scale < 1:
+        raise ValueError("Source image is too small for the requested aspect ratio.")
+    crop_width, crop_height = ratio_width * scale, ratio_height * scale
+    left = round((width - crop_width) * crop_position[0])
+    top = round((height - crop_height) * crop_position[1])
+    return image.crop((left, top, left + crop_width, top + crop_height))
 
 
 def find_font(explicit: str | None) -> str:
@@ -71,8 +114,10 @@ def draw_cover(
     start_ratio: float | None = None,
     band_height_ratio: float | None = None,
     gap_ratio: float | None = None,
+    aspect_ratio: tuple[int, int] | None = (3, 4),
+    crop_position: tuple[float, float] = (0.5, 0.5),
 ) -> Image.Image:
-    base = image.convert("RGBA")
+    base = prepare_cover(image, aspect_ratio, crop_position)
     width, height = base.size
     quotes = [quote.strip() for quote in quotes if quote.strip()]
     if not quotes:
@@ -134,6 +179,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--line", action="append", dest="lines", required=True, help="One quote line; repeat for each band")
     parser.add_argument("--font", help="Optional CJK .ttf/.ttc font path")
     parser.add_argument("--font-size", type=int, default=52, help="Font size in pixels")
+    parser.add_argument("--aspect-ratio", type=parse_aspect_ratio, default=(3, 4), help="Output W:H ratio (default: 3:4); use source to preserve the original ratio")
+    parser.add_argument("--crop-position", type=parse_crop_position, nargs=2, default=(0.5, 0.5), metavar=("X", "Y"), help="Crop alignment from 0 to 1 (default: 0.5 0.5); use 0.5 0 to keep the top")
     parser.add_argument("--start-ratio", type=float, help="Top of first band as a fraction of image height")
     parser.add_argument("--band-height-ratio", type=float, help="Band height as a fraction of image height")
     parser.add_argument("--gap-ratio", type=float, help="Gap between bands as a fraction of image height")
@@ -152,6 +199,8 @@ def main() -> None:
         start_ratio=args.start_ratio,
         band_height_ratio=args.band_height_ratio,
         gap_ratio=args.gap_ratio,
+        aspect_ratio=args.aspect_ratio,
+        crop_position=tuple(args.crop_position),
     )
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
