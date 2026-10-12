@@ -1,0 +1,7 @@
+interface:
+  display_name: "小红书汽车图文风格工坊"
+  short_description: "从账号或帖子链接学习汽车内容风格，一键制作原创文案、封面和内页成图"
+  default_prompt: "Use $xhs-car-style to learn the style of this Xiaohongshu account or post link and create an original car post with finished cover and carousel images."
+
+policy:
+  allow_implicit_invocation: true

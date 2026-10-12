@@ -1,4 +1,16 @@
-# Golden Quote Cover
+# Content Production Skills
+
+## Xiaohongshu Car Style
+
+**小红书汽车图文风格工坊** learns reusable copywriting and visual rules from accessible Xiaohongshu account or post links and creates original new-car or used-car posts with finished cover and carousel images.
+
+- `xhs-car-style/SKILL.md` — link-only input, account style profile, fact verification, image generation and composition workflow
+- `xhs-car-style/references/style-profile.md` — reusable evidence-backed profile fields
+- `xhs-car-style/agents/openai.yaml` — UI metadata
+
+Invoke `$xhs-car-style` with an account or post link and an optional topic. Image production requires an available image generation tool and a deterministic text compositor such as Pillow/Sharp or browser screenshot rendering. Blocked links and missing tools are reported explicitly; the skill does not contain a scraper or publish posts automatically.
+
+## Golden Quote Cover
 
 **金句封面工坊** extracts high-impact Chinese quotes from a video subtitle transcript and composes them onto a cover image with segmented horizontal slices, translucent bands, and subject-safe typography.
 
