@@ -1,15 +1,5 @@
 # Content Production Skills
 
-## Xiaohongshu Aesthetic Recreate
-
-**医美小红书复刻工坊** turns a reference post link into original aesthetic-medicine copy and finished cover/carousel images, preserving the observed structure and visual relationships while verifying medical claims and separating illustrative visuals from real treatment cases.
-
-- `xhs-aesthetic-recreate/SKILL.md` — link reading, reference analysis, factual boundaries, image production and delivery
-- `xhs-aesthetic-recreate/references/seed-post.md` — observations from the initial two-image reference
-- `xhs-aesthetic-recreate/agents/openai.yaml` — UI metadata
-
-Invoke `$xhs-aesthetic-recreate` with a post link and an optional topic. Actual image delivery requires rendering or image-generation tools; blocked links and missing tools are reported explicitly. Publishing is outside the default workflow.
-
 ## Xiaohongshu Car Style
 
 **小红书汽车图文风格工坊** learns reusable copywriting and visual rules from accessible Xiaohongshu account or post links and creates original new-car or used-car posts with finished cover and carousel images.
